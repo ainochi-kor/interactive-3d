@@ -7,7 +7,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 
 // 메쉬를 장면에 추가하고 그림자 설정을 활성화하는 함수
 const addSceneWithShadow = (mesh) => {
-  // mesh.castShadow = true; // 메쉬가 그림자를 투영하도록 설정
+  mesh.castShadow = true; // 메쉬가 그림자를 투영하도록 설정
   mesh.receiveShadow = true; // 메쉬가 그림자를 받을 수 있도록 설정
   scene.add(mesh); // 장면에 메쉬 추가
 };
@@ -102,6 +102,44 @@ const torusKnotLambertMesh = new THREE.Mesh(torusKnotGeometry, torusKnotLambertM
 torusKnotLambertMesh.position.set(-2, 1, 0);
 addSceneWithShadow(torusKnotLambertMesh);
 
+const torusKnotPhongMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+torusKnotPhongMaterial.emissive = new THREE.Color(0xff0000);
+torusKnotPhongMaterial.emissiveIntensity = 0.2;
+torusKnotPhongMaterial.specular = new THREE.Color(0x0000ff);
+torusKnotPhongMaterial.shininess = 100;
+const torusKnotPhongMesh = new THREE.Mesh(torusKnotGeometry, torusKnotPhongMaterial);
+torusKnotPhongMesh.position.set(0, 1, 0);
+addSceneWithShadow(torusKnotPhongMesh);
+
+const torusKnotBasicMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const torusKnotBasicMesh = new THREE.Mesh(torusKnotGeometry, torusKnotBasicMaterial);
+torusKnotBasicMesh.position.set(2, 1, 0);
+addSceneWithShadow(torusKnotBasicMesh);
+
+const torusKnotDepthMaterial = new THREE.MeshDepthMaterial({
+  colorWrite: true,
+});
+torusKnotDepthMaterial.opacity = 0.5;
+const torusKnotDepthMesh = new THREE.Mesh(torusKnotGeometry, torusKnotDepthMaterial);
+torusKnotDepthMesh.position.set(4, 1, 0);
+addSceneWithShadow(torusKnotDepthMesh);
+
+const textureLoader = new THREE.TextureLoader();
+// const texture = textureLoader.load("/threejs.webp", (texture) => {
+//   const textureBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
+//   const textureBoxMaterial = new THREE.MeshStandardMaterial({ map: texture });
+//   const textureBoxMesh = new THREE.Mesh(textureBoxGeometry, textureBoxMaterial);
+//   textureBoxMesh.position.set(0, 0.5, 2);
+//   addSceneWithShadow(textureBoxMesh);
+// });
+
+const texture = await textureLoader.loadAsync("/threejs.webp");
+const textureBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
+const textureBoxMaterial = new THREE.MeshStandardMaterial({ map: texture });
+const textureBoxMesh = new THREE.Mesh(textureBoxGeometry, textureBoxMaterial);
+textureBoxMesh.position.set(0, 0.5, 2);
+addSceneWithShadow(textureBoxMesh);
+
 // 창 크기 조정 이벤트 처리
 window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight); // 렌더러 크기 업데이트
@@ -113,5 +151,6 @@ window.addEventListener("resize", () => {
 const render = () => {
   renderer.render(scene, camera); // 장면 렌더링
   requestAnimationFrame(render); // 다음 프레임 요청
+  textureBoxMesh.rotation.y += 0.01; // 메쉬 회전
 };
 render(); // 렌더링 시작
